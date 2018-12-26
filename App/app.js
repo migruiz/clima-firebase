@@ -1,4 +1,5 @@
 var mqtt = require('./mqttCluster.js');
+var Zone = require('./Zone.js');
 global.zonesConfiguration= {
     masterroom: 'upstairs',   
     livingroom:  'downstairs',
@@ -10,6 +11,13 @@ global.zonesConfiguration= {
 global.mtqqLocalPath = "mqtt://piscos.tk";
 //global.mtqqLocalPath = process.env.MQTTLOCAL;
 (async function(){
+
+    for (var key in global.zonesConfiguration) {
+      var zoneConfig=global.zonesConfiguration[key]
+      var zone=new Zone(key)
+      await zone.initAsync()
+  }
+
     var admin = require("firebase-admin");
 
     var serviceAccount = require("./serviceAccountKey.json");
@@ -45,15 +53,7 @@ global.mtqqLocalPath = "mqtt://piscos.tk";
             topic: topic
           };
         
-        // Send a message to devices subscribed to the provided topic.
-        admin.messaging().send(message)
-          .then((response) => {
-            // Response is a message ID string.
-            console.log('Successfully sent message:', response);
-          })
-          .catch((error) => {
-            console.log('Error sending message:', error);
-          });
+
 
 
 
