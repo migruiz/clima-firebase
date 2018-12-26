@@ -10,7 +10,21 @@ global.zonesConfiguration= {
 global.mtqqLocalPath = "mqtt://piscos.tk";
 //global.mtqqLocalPath = process.env.MQTTLOCAL;
 (async function(){
-    
+    var admin = require("firebase-admin");
+
+    var serviceAccount = require("./serviceAccountKey.json");
+
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+      databaseURL: "https://clima-b87e7.firebaseio.com"
+    });
+
+
+    var db = admin.database();
+    var ref = db.ref("test");
+    ref.on("value", function(snapshot) {
+      console.log(snapshot.val());
+    });
   })();
 
   
