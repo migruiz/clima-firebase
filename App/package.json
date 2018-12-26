@@ -1,0 +1,14 @@
+{
+  "name": "boiler-control",
+  "version": "0.0.0",
+  "description": "BoilerControl",
+  "main": "app.js",
+  "author": {
+    "name": "piscos"
+  },
+  "dependencies": {
+    "mqtt": "^2.18.3",
+    "sqlite3": "^3.1.13",
+    "a-promise-queue": "2.0.0"
+  }
+}
