@@ -9,7 +9,7 @@ notifications:
   email:
   - mig.ruiz@gmail.com
 before_install:
+- cd App
 - openssl aes-256-cbc -K $encrypted_1911c56bbf8a_key -iv $encrypted_1911c56bbf8a_iv
   -in serviceAccountKey.json.enc -out serviceAccountKey.json -d
-- cd App
 - cd ..
