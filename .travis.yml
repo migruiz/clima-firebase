@@ -1,14 +1,13 @@
 sudo: required
-
-
 services:
-  - docker
-
+- docker
 env:
   global:
-    - PI_APP=clima-boiler-rpi3
+  - PI_APP=clima-boiler-rpi3
 script: bash travis.sh || travis_terminate 1;
-
 notifications:
-   email:
-      - mig.ruiz@gmail.com
+  email:
+  - mig.ruiz@gmail.com
+before_install:
+- openssl aes-256-cbc -K $encrypted_1911c56bbf8a_key -iv $encrypted_1911c56bbf8a_iv
+  -in serviceAccountKey.json.enc -out serviceAccountKey.json -d
