@@ -9,14 +9,14 @@ apt-get install -yqq --no-install-recommends g++ gcc make && rm -rf /var/lib/apt
 
 
 
-RUN mkdir /ClimaBoiler/
-COPY App/package.json  /ClimaBoiler/package.json
+RUN mkdir /ClimaFirebase/
+COPY App/package.json  /ClimaFirebase/package.json
 
-RUN cd /ClimaBoiler \
+RUN cd /ClimaFirebase \
 && npm  install 
 
 
-COPY App /ClimaBoiler
+COPY App /ClimaFirebase
 
 
 
@@ -24,4 +24,4 @@ RUN [ "cross-build-end" ]
 
 
 
-ENTRYPOINT ["node","/ClimaBoiler/app.js"]
+ENTRYPOINT ["node","/ClimaFirebase/app.js"]
