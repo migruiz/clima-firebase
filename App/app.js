@@ -14,7 +14,7 @@ global.mtqqLocalPath = "mqtt://piscos.tk";
 
     for (var key in global.zonesConfiguration) {
       var zoneConfig=global.zonesConfiguration[key]
-      var zone=new Zone(key)
+      var zone=new Zone(key,zoneConfig)
       await zone.initAsync()
   }
 
