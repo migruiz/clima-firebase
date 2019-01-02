@@ -1,5 +1,6 @@
 var mqtt = require('./mqttCluster.js');
 var Zone = require('./Zone.js');
+const BoilerValve=require('./BoilerValve')
 global.zonesConfiguration= {
     masterroom: 'upstairs',   
     livingroom:  'downstairs',
@@ -7,6 +8,12 @@ global.zonesConfiguration= {
     masterbathroom:  'upstairs',
     computerroom:  'upstairs',
     secondbedroom: 'upstairs'
+}
+global.boilerValves={
+  upstairs:new BoilerValve('upstairs'),
+  downstairs:new BoilerValve('downstairs'),
+  test:new BoilerValve('test'),
+  hotwater:new BoilerValve('hotwater')
 }
 global.mtqqLocalPath = "mqtt://piscos.tk";
 //global.mtqqLocalPath = process.env.MQTTLOCAL;
@@ -17,6 +24,10 @@ global.mtqqLocalPath = "mqtt://piscos.tk";
       var zone=new Zone(key,zoneConfig)
       await zone.initAsync()
   }
+  await global.boilerValves.upstairs.initAsync();
+  await global.boilerValves.downstairs.initAsync();
+  await global.boilerValves.test.initAsync();
+  await global.boilerValves.hotwater.initAsync();
 
     var admin = require("firebase-admin");
 
