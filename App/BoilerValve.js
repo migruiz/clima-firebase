@@ -1,7 +1,7 @@
 
 var mqtt = require('./mqttCluster.js');
 const MINUTESTOMONITOR=60
-const ALARMWHENTOTALONTIMEMINUTES=2;
+const ALARMWHENTOTALONTIMEMINUTES=20;
 class BoilerValve{
     constructor(valveCode) {      
        this.valveCode=valveCode;
@@ -14,12 +14,10 @@ class BoilerValve{
         this.firebaseAdmin=firebaseAdmin;
         var mqttCluster=await mqtt.getClusterAsync() 
         mqttCluster.subscribeData('valves/'+this.valveCode+'/changes', this.onZoneValveChanged.bind(this));
-        if (this.valveCode=="test"){
-            this.createCheckInterval()
-        }
+        this.createCheckInterval()
     }
     createCheckInterval(){
-        this.checkInterval=setInterval(this.checkIfValveHasBeenOnTooLong.bind(this),1000*10)
+        this.checkInterval=setInterval(this.checkIfValveHasBeenOnTooLong.bind(this),1000*60)
     }
     sendONAlertNotification(){
         var topic = 'zonesalerts';
@@ -30,7 +28,7 @@ class BoilerValve{
             },
             notification: {
                 title: 'Clima Alert',
-                body: this.valveCode +  " Valve has been ON for more than " + ALARMWHENTOTALONTIMEMINUTES +" minutes in the last hour"
+                body: this.valveCode +  " Valve ON for more than " + ALARMWHENTOTALONTIMEMINUTES +" minutes in the last hour"
               },
             topic: topic
           };
@@ -47,15 +45,15 @@ class BoilerValve{
         var now=Math.floor(Date.now() / 1000);
         var starTimeMonitorInterval=now - 60 * MINUTESTOMONITOR
         this.deleteEntriesBefore(starTimeMonitorInterval);
-        var counterOnSecs = this.getValveTotalOnElapsedSecs(starTimeMonitorInterval, now);
-        console.log(this.valveCode+ " "+ counterOnSecs)
+        var counterOnSecs = this.getValveTotalOnElapsedSecs(starTimeMonitorInterval, now);        
         if (counterOnSecs>ALARMWHENTOTALONTIMEMINUTES * 60){
+            console.log(this.valveCode+ " alert more than "+ counterOnSecs)
             this.sendONAlertNotification()
             clearInterval(this.checkInterval);
             var self=this;
             setTimeout(() => {
                 self.createCheckInterval();
-            }, 1000 * 60 * 5);
+            }, 1000 * 60 * MINUTESTOMONITOR);
         }
     }
     getValveTotalOnElapsedSecs(starTimeMonitorInterval, now) {
@@ -94,7 +92,6 @@ class BoilerValve{
             var now=Math.floor(Date.now() / 1000);
             this.history[now]=state
             this.lastState=state;
-            console.log(this.valveCode + " "+ now + " "+state)
         }
       }
 }
