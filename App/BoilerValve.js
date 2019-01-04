@@ -10,33 +10,33 @@ class BoilerValve{
     async initAsync(){
         var mqttCluster=await mqtt.getClusterAsync() 
         mqttCluster.subscribeData('valves/'+this.valveCode+'/changes', this.onZoneValveChanged.bind(this));
-        setInterval(this.checkIfValveHasBeenOnTooLong.bind(this),1000*60)
+        if (this.valveCode=="test"){
+
+            setInterval(this.checkIfValveHasBeenOnTooLong.bind(this),1000*10)
+        }
     }
     checkIfValveHasBeenOnTooLong(){
         
         var now=Math.floor(Date.now() / 1000);
         var keys=Object.keys(this.history)
-        if (this.valveCode=="test"){
-
-        }
+        
         var starTimeMonitorInterval=now - 60 * MINUTESTOMONITOR
         var keysToDelete=keys.filter(k=>parseInt(k)<=starTimeMonitorInterval)
         keysToDelete.pop()
+        console.log("deleting keys " + JSON.stringify(keysToDelete))
         for (let index = 0; index < keysToDelete.length; index++) {
             const key = keysToDelete[index];
             delete this.history[key]
         }
         var counterOnSecs=0;
-        var lastTimeWasOn=null
-        var firstKey=Object.keys(this.history)[0];
-        if (this.history[firstKey]==true){
-            lastTimeWasOn=starTimeMonitorInterval
-        }
+        var lastTimeWasOn=starTimeMonitorInterval;
+
         for (var key in this.history) {
-            if (this.history[key]==false && lastTimeWasOn){
+            var inRange=parseInt(key)>starTimeMonitorInterval
+            if (inRange && this.history[key]==false){
                 counterOnSecs=counterOnSecs+(parseInt(key)-lastTimeWasOn)
             }
-            if (this.history[key]==true){
+            if (inRange && this.history[key]==true){
                 lastTimeWasOn=parseInt(key);
             }
         }
@@ -44,8 +44,7 @@ class BoilerValve{
         if (this.history[lastKey]==true){
             counterOnSecs=counterOnSecs+(now-lastTimeWasOn)
         }
-        if (counterOnSecs)
-        console.log(this.valveCode + counterOnSecs)
+        console.log(this.valveCode +' '+ counterOnSecs)
 
     }
     onZoneValveChanged(state){
@@ -53,6 +52,7 @@ class BoilerValve{
             var now=Math.floor(Date.now() / 1000);
             this.history[now]=state
             this.lastState=state;
+            console.log(this.valveCode + " "+ now + " "+state)
         }
       }
 }
