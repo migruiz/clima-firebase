@@ -24,19 +24,20 @@ global.mtqqLocalPath = "mqtt://piscos.tk";
       var zone=new Zone(key,zoneConfig)
       await zone.initAsync()
   }
-  await global.boilerValves.upstairs.initAsync();
-  await global.boilerValves.downstairs.initAsync();
-  await global.boilerValves.test.initAsync();
-  await global.boilerValves.hotwater.initAsync();
+  var admin = require("firebase-admin");
 
-    var admin = require("firebase-admin");
+  var serviceAccount = require("./serviceAccountKey.json");
 
-    var serviceAccount = require("./serviceAccountKey.json");
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://clima-b87e7.firebaseio.com"
+  });
+  await global.boilerValves.upstairs.initAsync(admin);
+  await global.boilerValves.downstairs.initAsync(admin);
+  await global.boilerValves.test.initAsync(admin);
+  await global.boilerValves.hotwater.initAsync(admin);
 
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-      databaseURL: "https://clima-b87e7.firebaseio.com"
-    });
+
 
 
     var db = admin.database();
@@ -44,33 +45,6 @@ global.mtqqLocalPath = "mqtt://piscos.tk";
     ref.on("value", function(snapshot) {
       console.log(snapshot.val());
     });
-
-    var mqttCluster=await mqtt.getClusterAsync() 
-    mqttCluster.subscribeData("testValve/turn", function(content) {
-        
-
-        var topic = 'zonesalerts';
-
-        // See documentation on defining a message payload.
-        var message = {
-            data: {
-              score: '850',
-              time: '2:45'
-            },
-            notification: {
-                title: '$GOOG up 1.43% on the day',
-                body: content.toString()
-              },
-            topic: topic
-          };
-        
-
-
-
-
-
-    });
-
 
   })();
 
