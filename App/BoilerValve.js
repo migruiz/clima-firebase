@@ -7,16 +7,19 @@ class BoilerValve{
        this.valveCode=valveCode;
        this.lastState;
        this.firebaseAdmin;
-       this.history={}
+       this.history={};
+       this.checkInterval;
     }
     async initAsync(firebaseAdmin){
         this.firebaseAdmin=firebaseAdmin;
         var mqttCluster=await mqtt.getClusterAsync() 
         mqttCluster.subscribeData('valves/'+this.valveCode+'/changes', this.onZoneValveChanged.bind(this));
         if (this.valveCode=="test"){
-
-            setInterval(this.checkIfValveHasBeenOnTooLong.bind(this),1000*10)
+            this.createCheckInterval()
         }
+    }
+    createCheckInterval(){
+        this.checkInterval=setInterval(this.checkIfValveHasBeenOnTooLong.bind(this),1000*10)
     }
     sendONAlertNotification(){
         var topic = 'zonesalerts';
@@ -48,7 +51,11 @@ class BoilerValve{
         console.log(this.valveCode+ " "+ counterOnSecs)
         if (counterOnSecs>ALARMWHENTOTALONTIMEMINUTES * 60){
             this.sendONAlertNotification()
-            this.deleteEntriesBefore(now)
+            clearInterval(this.checkInterval);
+            var self=this;
+            setTimeout(() => {
+                self.createCheckInterval();
+            }, 1000 * 60 * 5);
         }
     }
     getValveTotalOnElapsedSecs(starTimeMonitorInterval, now) {
