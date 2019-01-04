@@ -80,7 +80,9 @@ class BoilerValve{
         var keys=Object.keys(this.history)
         var keysToDelete = keys.filter(k => parseInt(k) <= starTime);
         keysToDelete.pop();
-        console.log("deleting keys " + JSON.stringify(keysToDelete));
+        if (keysToDelete.length>0){
+            console.log("deleting keys " + JSON.stringify(keysToDelete));
+        }
         for (let index = 0; index < keysToDelete.length; index++) {
             const key = keysToDelete[index];
             delete this.history[key];
