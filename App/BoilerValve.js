@@ -47,7 +47,7 @@ class BoilerValve{
         this.deleteEntriesBefore(starTimeMonitorInterval);
         var counterOnSecs = this.getValveTotalOnElapsedSecs(starTimeMonitorInterval, now);        
         if (counterOnSecs>ALARMWHENTOTALONTIMEMINUTES * 60){
-            console.log(this.valveCode+ " alert more than "+ counterOnSecs)
+            //console.log(this.valveCode+ " alert more than "+ counterOnSecs)
             this.sendONAlertNotification()
             clearInterval(this.checkInterval);
             var self=this;
